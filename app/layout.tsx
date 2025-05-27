@@ -10,7 +10,6 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "NuBox Spain - E-commerce",
   description: "Plataforma de e-commerce moderna para NuBox Spain",
-    generator: 'v0.dev'
 }
 
 export default function RootLayout({

@@ -14,24 +14,17 @@ const firebaseConfig = {
   measurementId: "G-JCRHGQWSK6",
 }
 
-// Inicializar Firebase solo si no existe ya una instancia
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp()
+// Inicializar Firebase solo una vez
+let app
+if (getApps().length === 0) {
+  app = initializeApp(firebaseConfig)
+} else {
+  app = getApp()
+}
 
 // Inicializar servicios de Firebase
 export const auth = getAuth(app)
 export const db = getFirestore(app)
 export const storage = getStorage(app)
-
-// Solo para desarrollo - conectar emuladores si es necesario
-if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
-  // Puedes descomentar estas líneas si quieres usar emuladores locales
-  // try {
-  //   connectAuthEmulator(auth, "http://localhost:9099")
-  //   connectFirestoreEmulator(db, "localhost", 8080)
-  //   connectStorageEmulator(storage, "localhost", 9199)
-  // } catch (error) {
-  //   console.log("Emulators already connected")
-  // }
-}
 
 export default app

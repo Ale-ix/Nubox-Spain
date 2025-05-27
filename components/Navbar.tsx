@@ -4,6 +4,8 @@ import { useState } from "react"
 import Link from "next/link"
 import { useAuth } from "@/hooks/useAuth"
 import { useCart } from "@/hooks/useCart"
+import { signOut } from "firebase/auth"
+import { auth } from "@/lib/firebase"
 
 export default function Navbar() {
   const { user, userRole } = useAuth()
@@ -12,8 +14,6 @@ export default function Navbar() {
 
   const handleSignOut = async () => {
     try {
-      const { signOut } = await import("firebase/auth")
-      const { auth } = await import("@/lib/firebase")
       await signOut(auth)
     } catch (error) {
       console.error("Error cerrando sesión:", error)

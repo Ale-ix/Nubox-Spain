@@ -1,8 +1,9 @@
 "use client"
 
 import type React from "react"
-
-import { useState, useEffect } from "react"
+import { useState } from "react"
+import { signInWithEmailAndPassword } from "firebase/auth"
+import { auth } from "@/lib/firebase"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 
@@ -11,41 +12,27 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
-  const [firebaseReady, setFirebaseReady] = useState(false)
   const router = useRouter()
-
-  useEffect(() => {
-    // Cargar Firebase dinámicamente
-    import("@/lib/firebase")
-      .then(() => {
-        setFirebaseReady(true)
-      })
-      .catch((error) => {
-        console.error("Error cargando Firebase:", error)
-        setError("Error de configuración. Por favor, recarga la página.")
-      })
-  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    if (!firebaseReady) {
-      setError("Firebase aún no está listo. Por favor, espera un momento.")
-      return
-    }
-
     setError("")
     setLoading(true)
 
     try {
-      const { signInWithEmailAndPassword } = await import("firebase/auth")
-      const { auth } = await import("@/lib/firebase")
-
       await signInWithEmailAndPassword(auth, email, password)
       router.push("/products")
     } catch (error: any) {
       console.error("Error de login:", error)
-      setError("Credenciales incorrectas. Por favor, verifica tu email y contraseña.")
+      if (error.code === "auth/user-not-found") {
+        setError("No existe una cuenta con este email")
+      } else if (error.code === "auth/wrong-password") {
+        setError("Contraseña incorrecta")
+      } else if (error.code === "auth/invalid-email") {
+        setError("Email inválido")
+      } else {
+        setError("Error al iniciar sesión. Verifica tus credenciales.")
+      }
     } finally {
       setLoading(false)
     }
@@ -97,12 +84,8 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <button
-              type="submit"
-              disabled={loading || !firebaseReady}
-              className="btn-primary w-full disabled:opacity-50"
-            >
-              {loading ? "Iniciando sesión..." : !firebaseReady ? "Cargando..." : "Iniciar Sesión"}
+            <button type="submit" disabled={loading} className="btn-primary w-full">
+              {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
             </button>
           </div>
 

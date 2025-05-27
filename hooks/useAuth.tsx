@@ -1,22 +1,11 @@
 "use client"
 
 import type React from "react"
-
 import { createContext, useContext, useEffect, useState } from "react"
 import { type User, onAuthStateChanged } from "firebase/auth"
 import { doc, getDoc } from "firebase/firestore"
+import { auth, db } from "@/lib/firebase"
 import { CartProvider } from "./useCart"
-
-// Importación dinámica de Firebase para evitar errores de SSR
-let auth: any = null
-let db: any = null
-
-if (typeof window !== "undefined") {
-  import("@/lib/firebase").then((firebase) => {
-    auth = firebase.auth
-    db = firebase.db
-  })
-}
 
 interface AuthContextType {
   user: User | null
@@ -34,34 +23,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [userRole, setUserRole] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
-  const [firebaseReady, setFirebaseReady] = useState(false)
 
   useEffect(() => {
-    // Asegurar que Firebase esté listo antes de usar
-    const initFirebase = async () => {
-      if (typeof window !== "undefined") {
-        try {
-          const firebase = await import("@/lib/firebase")
-          auth = firebase.auth
-          db = firebase.db
-          setFirebaseReady(true)
-        } catch (error) {
-          console.error("Error inicializando Firebase:", error)
-          setLoading(false)
-        }
-      }
-    }
-
-    initFirebase()
-  }, [])
-
-  useEffect(() => {
-    if (!firebaseReady || !auth) return
-
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user)
 
-      if (user && db) {
+      if (user) {
         try {
           const userDoc = await getDoc(doc(db, "users", user.uid))
           if (userDoc.exists()) {
@@ -81,7 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })
 
     return () => unsubscribe()
-  }, [firebaseReady])
+  }, [])
 
   return (
     <AuthContext.Provider value={{ user, userRole, loading }}>

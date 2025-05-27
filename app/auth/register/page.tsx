@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { createUserWithEmailAndPassword } from "firebase/auth"
 import { doc, setDoc } from "firebase/firestore"
@@ -49,6 +48,8 @@ export default function RegisterPage() {
         setError("Este email ya está registrado")
       } else if (error.code === "auth/weak-password") {
         setError("La contraseña es muy débil")
+      } else if (error.code === "auth/invalid-email") {
+        setError("Email inválido")
       } else {
         setError("Error al crear la cuenta. Inténtalo de nuevo.")
       }
