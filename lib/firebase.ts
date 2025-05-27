@@ -6,7 +6,7 @@ import { getStorage } from "firebase/storage"
 // Tu configuración de Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBQNdoAtMDVIfNvR_6EkhEg0gcXw33D75w",
-  authDomain: "nubox-spain.firebaseapp.com",
+  authDomain: "nuboxspain.netlify.app",
   projectId: "nubox-spain",
   storageBucket: "nubox-spain.firebasestorage.app",
   messagingSenderId: "785053484106",
